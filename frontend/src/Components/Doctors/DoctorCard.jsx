@@ -1,11 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import starIcon from "../../assets/images/Star.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BsArrowRight } from "react-icons/bs";
-import { GiDoctorFace } from "react-icons/gi";
 import { FaUserMd } from "react-icons/fa";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 
 const DoctorCard = ({ doctor }) => {
+  const [loading, setLoading] = useState(false);
+  const { token } = useAuth();
+  const navigate = useNavigate();
+
+  const handleBooking = async () => {
+    try {
+      setLoading(true);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulate successful payment
+      const success = Math.random() > 0.3; // 70% success rate
+      
+      if (success) {
+        toast.success("Payment successful! Appointment booked.");
+        navigate("/checkout-success");
+      } else {
+        toast.error("Payment failed. Please try again.");
+      }
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const {
     name,
     averageRating,
@@ -46,11 +74,25 @@ const DoctorCard = ({ doctor }) => {
         </div>
         <Link
           to={`/doctors/${doctor._id}`}
-          className="w-[44px]
-                 h-[44px] rounded-full border border-solid border-[#181A1E]  flex items-center justify-center hover:bg-primaryColor hover:border-none "
+          className="w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E] flex items-center justify-center hover:bg-primaryColor hover:border-none"
         >
           <BsArrowRight className="group-hover:text-white w-6 h-5" />
         </Link>
+      </div>
+      <div className="mt-4">
+        <p className="text-gray-700">{doctor.bio}</p>
+        <div className="mt-4 flex justify-between items-center">
+          <span className="text-lg font-semibold text-indigo-600">
+            ₹{doctor.ticketPrice}
+          </span>
+          <button
+            onClick={handleBooking}
+            disabled={loading}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
+          >
+            {loading ? "Processing..." : "Book Appointment"}
+          </button>
+        </div>
       </div>
     </div>
   );
